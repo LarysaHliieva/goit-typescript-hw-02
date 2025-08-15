@@ -1,107 +1,101 @@
-import React, { Component } from 'react';
+import { useState, useEffect, useRef } from "react";
 
-import Searchbar from './Searchbar/Searchbar';
-import ImageGallery from './ImageGallery/ImageGallery';
-import Loader from './Loader/Loader';
-import Button from './Button/Button';
+import Searchbar from "./Searchbar/Searchbar";
+import ImageGallery from "./ImageGallery/ImageGallery";
+import Loader from "./Loader/Loader";
+import Button from "./Button/Button";
 
-import * as API from '../services/api';
+import * as API from "../services/api";
 
-import styles from './App.module.css';
+import styles from "./App.module.css";
 
 const perPage = 12;
 
-export class App extends Component {
-  state = {
-    items: [],
-    filter: '',
-    loading: false,
-    error: null,
-    page: 1,
-    residue: 0,
+const App = () => {
+  const [items, setItems] = useState([]);
+  const [filter, setFilter] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [residue, setResidue] = useState(0);
+
+  const galleryRef = useRef(null);
+
+  // Fetch images when filter or page changes
+  useEffect(() => {
+    if (!filter) return;
+
+    const fetchImages = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const images = await API.searchImages(filter, page, perPage);
+        setItems((prevItems) => [...prevItems, ...images.hits]);
+        setResidue(images.total - page * perPage);
+      } catch (err) {
+        console.error(err.message);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchImages();
+  }, [filter, page]);
+
+  // Smooth scroll after items update
+  useEffect(() => {
+    if (items.length === 0 || !galleryRef.current) return;
+
+    const firstCard = galleryRef.current.firstElementChild?.firstElementChild;
+    if (firstCard) {
+      const { height: cardHeight } = firstCard.getBoundingClientRect();
+      window.scrollBy({
+        top: cardHeight * 2,
+        behavior: "smooth",
+      });
+    }
+  }, [items]);
+
+  const onSearch = ({ filter: newFilter }) => {
+    if (newFilter === filter && page === 1) return;
+
+    setFilter(newFilter);
+    setItems([]);
+    setPage(1);
+    setResidue(0);
   };
 
-  galleryRef = React.createRef();
+  const loadMore = () => setPage((prev) => prev + 1);
 
-  async componentDidUpdate(prevProps, prevState) {
-    const { filter, page, items } = this.state;
+  const isNotFound = !items.length && filter && !loading;
 
-    if (prevState.filter !== filter || prevState.page !== page) {
-      this.fetchImages();
-    }
+  return (
+    <div className={styles.app}>
+      <Searchbar onSubmit={onSearch} />
 
-    if (items.length > prevState.items.length) {
-      this.smoothScroll();
-    }
-  }
-
-  async fetchImages() {
-    const { filter, page } = this.state;
-    this.setState({ loading: true });
-
-    try {
-      const images = await API.searchImages(filter, page, perPage);
-      this.setState(state => ({
-        items: [...state.items, ...images.hits],
-        residue: images.total - page * perPage,
-      }));
-    } catch (error) {
-      console.log(error.message);
-      this.setState({ error: error.message });
-    } finally {
-      this.setState({ loading: false });
-    }
-  }
-
-  loadMore = () => {
-    this.setState(({ page }) => ({ page: page + 1 }));
-  };
-
-  onSearch = ({ filter }) => {
-    if (filter === this.state.filter && this.state.page === 1) {
-      return;
-    }
-
-    this.setState({ filter, items: [], page: 1, residue: 0 });
-  };
-
-  smoothScroll() {
-    const { height: cardHeight } =
-      this.galleryRef.current.firstElementChild.firstElementChild.getBoundingClientRect();
-    window.scrollBy({
-      top: cardHeight * 2,
-      behavior: 'smooth',
-    });
-  }
-
-  render() {
-    const { items, filter, loading, error, residue } = this.state;
-    const isNotFound = !Boolean(items.length) && filter && !loading;
-
-    return (
-      <div className={styles.app}>
-        <Searchbar onSubmit={this.onSearch} />
-
-        <div ref={this.galleryRef}>
-          {Boolean(items.length) && <ImageGallery items={items} />}
-        </div>
-
-        {error && (
-          <p className={styles.message}>
-            😥 Something went wrong... Please, reload and try again!
-          </p>
-        )}
-
-        <Loader visible={loading} />
-
-        {residue > 0 && <Button onClick={this.loadMore} disabled={loading} />}
-
-        {isNotFound && (
-          <p className={styles.message}>
-            🙄 Sorry... Nothing was found for your request.
-          </p>
-        )}
+      <div ref={galleryRef}>
+        {items.length > 0 && <ImageGallery items={items} />}
       </div>
-    );
-  }
-}
+
+      {error && (
+        <p className={styles.message}>
+          😥 Something went wrong... Please, reload and try again!
+        </p>
+      )}
+
+      <Loader visible={loading} />
+
+      {residue > 0 && <Button onClick={loadMore} disabled={loading} />}
+
+      {isNotFound && (
+        <p className={styles.message}>
+          🙄 Sorry... Nothing was found for your request.
+        </p>
+      )}
+    </div>
+  );
+};
+
+export default App;
