@@ -1,15 +1,21 @@
-import { useEffect } from "react";
+import { useEffect, type MouseEvent } from "react";
 import styles from "./Modal.module.css";
 
-const Modal = ({ url, alt, onClose }) => {
-  const handleClose = (e) => {
-    if (e.currentTarget === e.target || e.code === "Escape") {
+interface ModalProps {
+  url: string;
+  alt: string;
+  onClose: () => void;
+}
+
+const Modal: React.FC<ModalProps> = ({ url, alt, onClose }) => {
+  const handleClose = (e: MouseEvent<HTMLDivElement>): void => {
+    if (e.currentTarget === e.target) {
       onClose();
     }
   };
 
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: globalThis.KeyboardEvent): void => {
       if (e.code === "Escape") {
         onClose();
       }

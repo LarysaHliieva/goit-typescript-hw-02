@@ -1,17 +1,18 @@
 import { useState } from "react";
 import Modal from "../../Modal/Modal";
 import styles from "./ImageGalleryItem.module.css";
+import type { ImageItem } from "../../../types/type";
 
 interface ImageGalleryItemProps {
-  item: "";
+  item: ImageItem;
 }
 
-const ImageGalleryItem = ({ item }) => {
-  const [isOpenModal, setIsOpenModal] = useState(false);
+const ImageGalleryItem: React.FC<ImageGalleryItemProps> = ({ item }) => {
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const { webformatURL, tags, largeImageURL } = item;
 
-  const openModal = () => setIsOpenModal(true);
-  const closeModal = () => setIsOpenModal(false);
+  const openModal = (): void => setIsOpenModal(true);
+  const closeModal = (): void => setIsOpenModal(false);
 
   return (
     <>

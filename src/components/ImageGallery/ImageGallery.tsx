@@ -1,8 +1,13 @@
 import ImageGalleryItem from "./ImageGalleryItem/ImageGalleryItem";
 
 import styles from "./ImageGallery.module.css";
+import type { ImageItem } from "../../types/type";
 
-const ImageGallery = ({ items = [] }) => {
+interface ImageGalleryProps {
+  items: ImageItem[];
+}
+
+const ImageGallery: React.FC<ImageGalleryProps> = ({ items = [] }) => {
   return (
     <ul className={styles.gallery} id="gallery">
       {items.map((item) => (
