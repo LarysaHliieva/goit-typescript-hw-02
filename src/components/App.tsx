@@ -9,13 +9,9 @@ import * as API from "../services/api";
 
 import styles from "./App.module.css";
 
-import type { ImageItem } from "../types/type";
+import type { ImageItem, SearchParams } from "../types/type";
 
 const perPage = 12;
-
-type SearchParams = {
-  filter: string;
-};
 
 const App = () => {
   const [items, setItems] = useState<ImageItem[]>([]);

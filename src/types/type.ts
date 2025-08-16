@@ -10,3 +10,7 @@ export interface ImagesResponse {
   total: number;
   totalHits: number;
 }
+
+export type SearchParams = {
+  filter: string;
+};
