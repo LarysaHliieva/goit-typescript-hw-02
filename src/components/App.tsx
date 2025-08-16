@@ -39,8 +39,10 @@ const App = () => {
         setItems((items) => [...items, ...images.hits]);
         setResidue(images.total - page * perPage);
       } catch (err) {
-        console.error(err.message);
-        setError(err.message);
+        if (err instanceof Error) {
+          console.error(err.message);
+          setError(err.message);
+        }
       } finally {
         setLoading(false);
       }
@@ -71,9 +73,9 @@ const App = () => {
     setResidue(0);
   };
 
-  const loadMore = () => setPage((prev) => prev + 1);
+  const loadMore = (): void => setPage((prev) => prev + 1);
 
-  const isNotFound = !items.length && filter && !loading;
+  const isNotFound: boolean = !items.length && Boolean(filter) && !loading;
 
   return (
     <div className={styles.app}>

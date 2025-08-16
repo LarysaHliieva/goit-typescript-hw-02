@@ -4,3 +4,9 @@ export interface ImageItem {
   tags: string;
   largeImageURL: string;
 }
+
+export interface ImagesResponse {
+  hits: ImageItem[];
+  total: number;
+  totalHits: number;
+}
