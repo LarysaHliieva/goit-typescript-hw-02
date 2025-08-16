@@ -1,8 +1,11 @@
+import styles from "./Button.module.css";
 
+interface ButtonProps {
+  onClick: () => void;
+  disabled?: boolean;
+}
 
-import styles from './Button.module.css';
-
-const Button = ({ onClick, disabled = false }) => {
+const Button: React.FC<ButtonProps> = ({ onClick, disabled = false }) => {
   return (
     <button
       className={styles.loadMore}
@@ -16,5 +19,3 @@ const Button = ({ onClick, disabled = false }) => {
 };
 
 export default Button;
-
-

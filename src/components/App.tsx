@@ -9,29 +9,34 @@ import * as API from "../services/api";
 
 import styles from "./App.module.css";
 
+import type { ImageItem } from "../types/type";
+
 const perPage = 12;
 
+type SearchParams = {
+  filter: string;
+};
+
 const App = () => {
-  const [items, setItems] = useState([]);
-  const [filter, setFilter] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [page, setPage] = useState(1);
-  const [residue, setResidue] = useState(0);
+  const [items, setItems] = useState<ImageItem[]>([]);
+  const [filter, setFilter] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState<number>(1);
+  const [residue, setResidue] = useState<number>(0);
 
-  const galleryRef = useRef(null);
+  const galleryRef = useRef<HTMLDivElement>(null);
 
-  // Fetch images when filter or page changes
   useEffect(() => {
     if (!filter) return;
 
-    const fetchImages = async () => {
+    const fetchImages = async (): Promise<void> => {
       setLoading(true);
       setError(null);
 
       try {
         const images = await API.searchImages(filter, page, perPage);
-        setItems((prevItems) => [...prevItems, ...images.hits]);
+        setItems((items) => [...items, ...images.hits]);
         setResidue(images.total - page * perPage);
       } catch (err) {
         console.error(err.message);
@@ -44,7 +49,6 @@ const App = () => {
     fetchImages();
   }, [filter, page]);
 
-  // Smooth scroll after items update
   useEffect(() => {
     if (items.length === 0 || !galleryRef.current) return;
 
@@ -58,7 +62,7 @@ const App = () => {
     }
   }, [items]);
 
-  const onSearch = ({ filter: newFilter }) => {
+  const onSearch = ({ filter: newFilter }: SearchParams): void => {
     if (newFilter === filter && page === 1) return;
 
     setFilter(newFilter);

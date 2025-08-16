@@ -2,6 +2,10 @@ import { useState } from "react";
 import Modal from "../../Modal/Modal";
 import styles from "./ImageGalleryItem.module.css";
 
+interface ImageGalleryItemProps {
+  item: "";
+}
+
 const ImageGalleryItem = ({ item }) => {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const { webformatURL, tags, largeImageURL } = item;

@@ -1,6 +1,10 @@
 import { FadeLoader } from "react-spinners";
 
-const Loader = ({ visible = false }) => (
+interface LoaderProps {
+  visible?: boolean;
+}
+
+const Loader: React.FC<LoaderProps> = ({ visible = false }) => (
   <FadeLoader
     loading={visible}
     color="#6f8fe7ff"
